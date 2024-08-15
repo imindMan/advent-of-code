@@ -48,28 +48,26 @@ def smallest_bounding(data_input, node):
                     bound = min(bound, check_range[check_range.index(des) + 1] - check_range[check_range.index(des)])
                 check_range.clear()
 
-    if bound is None:
-        bound = 0
+    if bound is None or bound == 0:
+        bound = 1
     return des, bound
 
 with open("day5.txt", encoding="utf-8") as f:
     seeds = list(map(int, f.readline()[7:].split(" ")))
-    seed_information = [x for i in range(0, len(seeds), 2) for x in range(seeds[i], seeds[i] + seeds[i + 1])]
     data_parsing = f.readlines()[1:]
 
     i = 0
     des_res = None 
 
-    while i < len(seed_information):
-        tracing_value, min_bounding = smallest_bounding(data_parsing, seed_information[i])
+    while i < len(seeds):
+        tracing_value, min_bounding = smallest_bounding(data_parsing, seeds[i])
         if des_res is None:
             des_res = tracing_value
         else:
             des_res = min(des_res, tracing_value)
-
-        if min_bounding == 0:
-            i += 1
-        else:
-            i += min_bounding
+        seeds[i] = seeds[i] + min_bounding
+        seeds[i + 1] = seeds[i + 1] - min_bounding
+        if seeds[i + 1] <= 0:
+            i += 2
 
     print(des_res)
