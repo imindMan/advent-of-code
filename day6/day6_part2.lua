@@ -31,29 +31,26 @@ for line in file:lines() do
 	i = i + 1
 end
 
-raw_data = {}
 index = 1
+time = ""
+distance = ""
 while index <= #data[1] do
-	raw_data[data[1][index]] = data[2][index]
+	time = time .. data[1][index]
+	distance = distance .. data[2][index]
 	index = index + 1
 end
+t = tonumber(time)
+d = tonumber(distance)
 
-res = 1
-index = 1
-while index <= #data[1] do
-	t = data[1][index]
-	d = raw_data[t]
-	delta = t * t - 4 * d
-	low = (t - math.sqrt(delta)) / 2
-	if math.floor(low) == low then
-		-- integer
-		low = math.ceil(low + 1)
-	else
-		low = math.floor(low)
-	end
-	res = res * (math.floor((t + math.sqrt(delta)) / 2) - low)
-	index = index + 1
+delta = t * t - 4 * d
+low = (t - math.sqrt(delta)) / 2
+if math.floor(low) == low then
+	-- integer
+	low = math.ceil(low + 1)
+else
+	low = math.floor(low)
 end
+res = math.floor((t + math.sqrt(delta)) / 2) - low
 print(res)
 
 file:close()
