@@ -8,6 +8,8 @@ function parseLine(line)
 	return table_record
 end
 
+-- same thing, but O(1) only
+
 data = {}
 file = io.open("day6.txt", "r")
 i = 1

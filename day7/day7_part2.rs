@@ -15,6 +15,7 @@ enum HandTypes {
     HighCard,
 }
 
+// same, but jokers implementation
 fn main() -> Result<(), String> {
     let mut fiveofakinds: Vec<(String, i32)> = Vec::new();
     let mut fourofakinds: Vec<(String, i32)> = Vec::new();

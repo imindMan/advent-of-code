@@ -1,5 +1,4 @@
-// Day 1 part 1 submission for the AoC in Java
-// Since the wheel told me to do so.
+// Idea: just can for every sngle characters and then parsing it
 
 import java.io.File;  // Import the File class
 import java.io.FileNotFoundException;  // Import this class to handle errors

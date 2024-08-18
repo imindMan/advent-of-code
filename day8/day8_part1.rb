@@ -14,6 +14,7 @@ end
 place = "AAA"
 step = 0
 
+# just scan for every steps
 while place != "ZZZ"
   instructions.chop.split("").each do |instruction|
     case instruction

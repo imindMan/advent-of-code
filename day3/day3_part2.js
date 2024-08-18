@@ -1,3 +1,5 @@
+// Also parsing
+
 let fs = require('fs');
 
 const data = fs.readFileSync("day3.txt", "utf-8").split("\n");

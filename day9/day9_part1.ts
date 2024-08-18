@@ -33,7 +33,7 @@ function allZero(array): boolean {
     return allzero
 
 }
-
+// a quick recursion implementation
 function extrapolate(tracing_history: number[][]) {
     if (tracing_history.length == 1) {
         return;

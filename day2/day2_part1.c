@@ -1,3 +1,4 @@
+// Idea: parsing every single characters and then return the value
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,3 +1,5 @@
+// This is also parsing characters while also "smart" checking positions and symbols
+
 let fs = require('fs');
 
 const data = fs.readFileSync("day3.txt", "utf-8").split("\n");

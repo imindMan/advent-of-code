@@ -47,6 +47,7 @@ func itemExists(array []int, element_to_check int) bool {
 	return false
 }
 
+// to solve this problem, a neat recursion implementation is necessary
 func counterCopies(scratchcard []int, data [][]int) (gain_copies int) {
     id := scratchcard[0]
     winning_scratchcards := scratchcard[1:CHECKPOINT + 1]

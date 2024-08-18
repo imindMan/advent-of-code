@@ -1,5 +1,5 @@
-// Day 1 part 2 submission in Java
-// since the wheel told me to do so.
+// Idea: just scan every single characters and parsing it
+
 
 import java.io.File;  // Import the File class
 import java.io.FileNotFoundException;  // Import this class to handle errors

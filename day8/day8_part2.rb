@@ -36,5 +36,5 @@ places_start.each do |place|
   place_path_records.append(step)
   step = 0
 end
-
+# lcm worked anyway
 puts place_path_records.reduce(1, :lcm)

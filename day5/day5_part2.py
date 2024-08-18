@@ -1,4 +1,9 @@
 def smallest_bounding(data_input, node):
+# A very not neat way to check the first value in the range
+# Instead of creating a bunch of numbers in the given range, I just make the first value of
+# that range pass all the maps and then return the maxinum bounding of it, so that I can cost 
+# down the time and space for the solution.
+# Although it's not that neat, it still works
     title_list = [
             "seed-to-soil map:\n", 
             "soil-to-fertilizer map:\n", 
@@ -60,13 +65,16 @@ with open("day5.txt", encoding="utf-8") as f:
     des_res = None 
 
     while i < len(seeds):
-        tracing_value, min_bounding = smallest_bounding(data_parsing, seeds[i])
+        # after finding the max bounding (which is actually the min since too large can be out of the control range)
+        # we just cut of the range and increase the checking value until the range is <= 0. 
+        # also implement the tracing value to be the return value if necessary
+        tracing_value, max_bounding = smallest_bounding(data_parsing, seeds[i])
         if des_res is None:
             des_res = tracing_value
         else:
             des_res = min(des_res, tracing_value)
-        seeds[i] = seeds[i] + min_bounding
-        seeds[i + 1] = seeds[i + 1] - min_bounding
+        seeds[i] = seeds[i] + max_bounding
+        seeds[i + 1] = seeds[i + 1] - max_bounding
         if seeds[i + 1] <= 0:
             i += 2
 

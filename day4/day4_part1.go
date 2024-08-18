@@ -41,6 +41,7 @@ func itemExists(array []int, element_to_check int) bool {
 	return false
 }
 
+// This is just basically parsing every single line and usng that data to return the value
 func parseLine(data string) int {
     winning_scratchcard_string := strings.Split(strings.Split(data[10:len(data)], "|")[0], " ")
     scratchcard_string := strings.Split(strings.Split(data[10:len(data)], "|")[1], " ")

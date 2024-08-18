@@ -14,7 +14,9 @@ enum HandTypes {
     OnePair,
     HighCard,
 }
-
+// normal ugly solution
+// check ranking, sort it, then merge it
+// and then count the total score
 fn main() -> Result<(), String> {
     let mut fiveofakinds: Vec<(String, i32)> = Vec::new();
     let mut fourofakinds: Vec<(String, i32)> = Vec::new();
