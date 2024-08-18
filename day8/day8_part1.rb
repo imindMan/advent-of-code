@@ -2,6 +2,7 @@
 file = File.open("day8.txt")
 
 instructions = file.readline
+# i'm too done with manual parsing so I just implement regex to save my time
 patterns = file.read.scan(/([A-Z]+) = \(([A-Z]+), ([A-Z]+)\)/)
 
 places_hash = Hash.new
