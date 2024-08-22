@@ -66,6 +66,8 @@ def move(instruction, map, x, y)
     else
       {-1, -1}
     end
+  else
+    {-1, -1}
   end
 end
 
@@ -89,6 +91,7 @@ def check_animal_position(map)
       end
       col += 1
     end
+    col = 0
     row += 1
   end
   # it's still possible to check if the position doesn't change, but this function is based on the input so :)
@@ -96,18 +99,23 @@ def check_animal_position(map)
 end
 
 def step_to_s(map, x, y)
-  all_passing_characters = [] of (Tuple(Int32, Int32) | Nil)
+  all_passing_characters = [{-1, -1}]
   if map[x][y] == 'S'
-    return Nil
+    return all_passing_characters
   end
   ["left", "right", "top", "bottom"].each do |instruction|
     step = move(instruction, map, x, y)
     if step != {-1, -1} || step != Nil
       all_passing_characters << step
-      step_to_s(map, step[0], step[1])
+      step_two = step_to_s(map, step[0], step[1])
+      if step_two != [{-1, -1}]
+        all_passing_characters + step_two
+      else
+        all_passing_characters.pop
+      end
     end
   end
   return all_passing_characters
 end
 
-step_to_s(file, 1, 2)
+p! step_to_s(file, 1, 2)
