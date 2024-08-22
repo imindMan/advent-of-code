@@ -98,24 +98,27 @@ def check_animal_position(map)
   return {row, col}
 end
 
-def step_to_s(map, x, y)
-  all_passing_characters = [{-1, -1}]
+def step_to_s(map, path_records, x, y)
   if map[x][y] == 'S'
-    return all_passing_characters
+    return path_records
+  elsif can_still_move(map, x, y) == false
+    return path_records
   end
   ["left", "right", "top", "bottom"].each do |instruction|
     step = move(instruction, map, x, y)
-    if step != {-1, -1} || step != Nil
-      all_passing_characters << step
-      step_two = step_to_s(map, step[0], step[1])
+    if step != {-1, -1} && !path_records.includes?(step)
+      path_records << step
+      step_two = step_to_s(map, path_records, step[0], step[1])
       if step_two != [{-1, -1}]
-        all_passing_characters + step_two
+        path_records + step_two
       else
-        all_passing_characters.pop
+        path_records.pop
       end
     end
   end
-  return all_passing_characters
+  return path_records
 end
 
-p! step_to_s(file, 1, 2)
+path_records = [{1, 2}] of Tuple(Int32, Int32)
+
+p! step_to_s(file, path_records, 1, 2)
