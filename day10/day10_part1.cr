@@ -46,7 +46,7 @@ def move(instruction, map, x, y)
     end
   when "top"
     case map[x][y]
-    when '|', 'L', 'S'
+    when '|', 'L', 'S', 'J'
       if map[x - 1][y] == '|' || map[x - 1][y] == 'F' || map[x - 1][y] == '7'
         {x - 1, y}
       else
@@ -87,21 +87,29 @@ def check_animal_position(map)
   while row != map.size - 1
     while col != map[0].size - 1
       if map[row][col] == 'S'
-        break
+        ["left", "right", "top", "bottom"].each do |instruction|
+          input = move(instruction, map, row, col)
+          if input != {-1, -1}
+            row = input[0]
+            col = input[1]
+            break
+          end
+        end
+        return {row, col}
       end
       col += 1
     end
     col = 0
     row += 1
   end
-  # it's still possible to check if the position doesn't change, but this function is based on the input so :)
+  # it's still possible to check if the position doesn't change, but this function is based on the input so :9)
   return {row, col}
 end
 
 def step_to_s(map, path_records, x, y)
   if map[x][y] == 'S'
     return path_records
-  elsif can_still_move(map, x, y) == false
+  elsif !can_still_move(map, x, y)
     return path_records
   end
   ["left", "right", "top", "bottom"].each do |instruction|
@@ -119,6 +127,6 @@ def step_to_s(map, path_records, x, y)
   return path_records
 end
 
-path_records = [{1, 2}] of Tuple(Int32, Int32)
-
-p! step_to_s(file, path_records, 1, 2)
+pos_to_check = check_animal_position(file)
+path_records = [pos_to_check] of Tuple(Int32, Int32)
+p! (step_to_s(file, path_records, pos_to_check[0], pos_to_check[1]).size + 1) / 2
