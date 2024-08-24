@@ -117,11 +117,7 @@ def step_to_s(map, path_records, x, y)
     if step != {-1, -1} && !path_records.includes?(step)
       path_records << step
       step_two = step_to_s(map, path_records, step[0], step[1])
-      if step_two != [{-1, -1}]
-        path_records + step_two
-      else
-        path_records.pop
-      end
+      path_records + step_two
     end
   end
   return path_records
