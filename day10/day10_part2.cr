@@ -93,7 +93,6 @@ def step_to_s(map, path_records, x, y)
       path_records << step
       step_two = step_to_s(map, path_records, step[0], step[1])
       path_records + step_two
-      # the pipe only has two connections, that's why it's guaranteed than there's only one branch at the runtime
     end
   end
   return path_records
@@ -101,4 +100,7 @@ end
 
 pos_to_check = check_animal_position(file)
 path_records = [pos_to_check] of Tuple(Int32, Int32)
-p! (step_to_s(file, path_records, pos_to_check[0], pos_to_check[1]).size + 1) / 2
+p! step_to_s(file, path_records, pos_to_check[0], pos_to_check[1])
+
+# plan: even-odd rule or maybe a simple hack like Pick's theorem and Shoelace formula
+# but seems like even-odd rule would be easier to implement so I picked it
