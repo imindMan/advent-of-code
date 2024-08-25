@@ -61,8 +61,8 @@ end
 def check_animal_position(map)
   col = 0
   row = 0
-  while row != map.size - 1
-    while col != map[0].size - 1
+  while row < map.size
+    while col < map[0].size
       if map[row][col] == 'S'
         ["left", "right", "top", "bottom"].each do |instruction|
           input = move(instruction, map, row, col)
@@ -100,7 +100,55 @@ end
 
 pos_to_check = check_animal_position(file)
 path_records = [pos_to_check] of Tuple(Int32, Int32)
-p! step_to_s(file, path_records, pos_to_check[0], pos_to_check[1])
+final = step_to_s(file, path_records, pos_to_check[0], pos_to_check[1])
 
 # plan: even-odd rule or maybe a simple hack like Pick's theorem and Shoelace formula
 # but seems like even-odd rule would be easier to implement so I picked it
+
+def is_point_in_path(x, y, poly)
+  c = false
+  i = 0
+  while i < poly.size
+    ax, ay = poly[i]
+    bx, by = poly[i - 1]
+    if (x == ax) && (y == ay)
+      return true
+    end
+    if (ay > y) != (by > y)
+      slope = (x - ax) * (by - ay) - (bx - ax) * (y - ay)
+      if slope == 0
+        # point is on boundary
+        return true
+      end
+      if (slope < 0) != (by < ay)
+        c = !c
+      end
+    end
+    i += 1
+  end
+  return c
+end
+
+def counter_inner_position(map, poly)
+  col = 0
+  row = 0
+  str_to_print = ""
+  counter = 0
+  while row < map.size
+    while col < map[0].size
+      if is_point_in_path(row, col, poly) && !poly.includes?({row, col}) && map[row][col] != 'S'
+        counter += 1
+        str_to_print += 'I'
+      else
+        str_to_print += map[row][col]
+      end
+      col += 1
+    end
+    str_to_print += '\n'
+    col = 0
+    row += 1
+  end
+  return counter
+end
+
+p! counter_inner_position(file, final)
