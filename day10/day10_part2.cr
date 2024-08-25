@@ -17,32 +17,14 @@ def move(instruction, map, x, y)
      instruction == "top" && x - 1 < 0 ||
      instruction == "bottom" && x + 1 > map.size - 1
     {-1, -1}
-  end
-  case instruction
-  when "left"
-    if ['-', 'J', '7', 'S'].includes?(map[x][y]) && ['-', 'F', 'L'].includes?(map[x][y - 1])
-      {x, y - 1}
-    else
-      {-1, -1}
-    end
-  when "right"
-    if ['-', 'F', 'L', 'S'].includes?(map[x][y]) && ['-', 'J', '7'].includes?(map[x][y + 1])
-      {x, y + 1}
-    else
-      {-1, -1}
-    end
-  when "top"
-    if ['|', 'L', 'S', 'J'].includes?(map[x][y]) && ['|', 'F', '7'].includes?(map[x - 1][y])
-      {x - 1, y}
-    else
-      {-1, -1}
-    end
-  when "bottom"
-    if ['|', '7', 'F', 'S'].includes?(map[x][y]) && ['|', 'L', 'J'].includes?(map[x + 1][y])
-      {x + 1, y}
-    else
-      {-1, -1}
-    end
+  elsif instruction == "left" && ['-', 'J', '7', 'S'].includes?(map[x][y]) && ['-', 'F', 'L'].includes?(map[x][y - 1])
+    {x, y - 1}
+  elsif instruction == "right" && ['-', 'F', 'L', 'S'].includes?(map[x][y]) && ['-', 'J', '7'].includes?(map[x][y + 1])
+    {x, y + 1}
+  elsif instruction == "top" && ['|', 'L', 'S', 'J'].includes?(map[x][y]) && ['|', 'F', '7'].includes?(map[x - 1][y])
+    {x - 1, y}
+  elsif instruction == "bottom" && ['|', '7', 'F', 'S'].includes?(map[x][y]) && ['|', 'L', 'J'].includes?(map[x + 1][y])
+    {x + 1, y}
   else
     {-1, -1}
   end
