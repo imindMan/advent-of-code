@@ -53,7 +53,7 @@
                                     $counter += abs($y1 - $y2);
                                 }
                                 else {
-                                    $counter += abs($x2 - $x1)*2 + abs($y2 - $y1) - abs($x2 - $x1);
+                                    $counter += abs($x2 - $x1) + abs($y2 - $y1);
                                 }
                             }
                             $y2++;
