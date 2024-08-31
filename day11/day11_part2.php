@@ -14,7 +14,6 @@
         for ($x = 0; $x < count($universe); $x++) {
             if (strpos($universe[$x], '#') === false) {
                 $row[] = $x;
-                $x++;
             }
         }
         # column addition
@@ -27,7 +26,6 @@
             }
             if (strpos($col_check, '#') === false) {
                 $col[] = $y;
-                $y++;
             }
         } 
         return array($row, $col); 
@@ -43,7 +41,7 @@
                     $y2 = ($y1 == strlen($universe[$x1]) - 1) ? 0: $y1;
                     while ($x2 < count($universe)) {
                         while ($y2 < strlen($universe[$x2])) {
-                            $n = 9;
+                            $n = 999999;
                             if ($universe[$x2][$y2] == '#') {
                                 if ($y2 == $y1) {
                                     // shortest path would be just row
@@ -67,24 +65,24 @@
                                     $counter += abs($y1 - $y2) + $col_adder;
                                 }
                                 else {
-                                    // x check
                                     $x1_calc = $x1;
                                     $y1_calc = $y1;
                                     $x2_calc = $x2;
                                     $y2_calc = $y2;
 
                                     foreach ($extend_universe[0] as $row_check) {
-                                        if ($row_check <= $x1_calc) {
+                                        if ($row_check < $x1) {
                                             $x1_calc += $n;
-                                        } elseif ($row_check <= $x2_calc) {
+                                        } 
+                                        if ($row_check < $x2) {
                                             $x2_calc += $n;
                                         }
                                     }
-                                    // y check 
                                     foreach ($extend_universe[1] as $col_check) {
-                                        if ($col_check <= $y1_calc) {
+                                        if ($col_check < $y1) {
                                             $y1_calc += $n;
-                                        } elseif ($col_check <= $y2_calc) {
+                                        } 
+                                        if ($col_check < $y2) {
                                             $y2_calc += $n;
                                         }
                                     }

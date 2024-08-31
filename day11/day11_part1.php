@@ -30,7 +30,6 @@
                 $y++;
             }
         } 
-    
     }
     extendUniverse($data);
     function stepCounter($universe) {
