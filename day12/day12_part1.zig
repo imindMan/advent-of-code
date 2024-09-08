@@ -43,6 +43,30 @@ fn array_contains(comptime T: type, haystack: []const T, needle: T) bool {
             return true;
     return false;
 }
+fn triggerChunks(machines: []const u8, chars: u8, start_pos: usize) ![] u8 {
+    var list_check = ArrayList(u8).init(std.heap.page_allocator);
+
+    var index: u8 = 0;
+    var curr_chunk_len: u8 = 0;
+    while (index < machines.len) {
+        if (machines[index] == '#' and index != start_pos) { 
+            curr_chunk_len += 1;
+            index += 1;
+        }
+        else if (machines[index] != '#' and index != start_pos) {
+            if (curr_chunk_len != 0) {
+                try list_check.append(curr_chunk_len);
+            }
+            curr_chunk_len = 0;
+            index += 1;
+        } else if (index == start_pos) {
+            try list_check.append(chars);
+            index += chars + 1;
+        }
+    }
+    return list_check.items;    
+}
+
 fn possibleCase(criterias: []u8, current_machine: []const u8, index_criteria: u8, index_machine: i8, counter: *i32) !void {
     const index_parse: u8 = @bitCast(index_machine);
     if (index_parse >= current_machine.len) {
@@ -57,17 +81,8 @@ fn possibleCase(criterias: []u8, current_machine: []const u8, index_criteria: u8
         try std.io.getStdOut().writer().print("{s}, Criterias: {any}, Index: {any}, Pass: {any}, Pos: {any}, Value: {any}\n", .{current_machine, criterias, track_index_parse, index_criteria, pos, counter.*});
         if (index_criteria == criterias.len -% 1 and pos != -1) {
             if (array_contains(i8, list_check.items, pos) == false) {
-                var status = true;
-                if (pos + 1 < current_machine.len) {
-                    const pos_trace: u8 = @bitCast(pos + 1);
-                    if (array_contains(u8, current_machine[pos_trace..current_machine.len], '#') == true) {
-                        status = false;
-                    } else if (array_contains(u8, current_machine[index_parse..pos_trace], '#') == true 
-                        and array_contains(u8, current_machine[index_parse..pos_trace], '.') or array_contains(u8, current_machine[index_parse..pos_trace], '?') == false) {
-                        status = false;
-                    } 
-                }
-                if (status == true) {
+                const chunks = try triggerChunks(current_machine[index_parse..current_machine.len], criterias[index_criteria], track_index -% index_parse);
+                if (chunks.len == 1) {
                     try list_check.append(pos);
                     counter.* += 1;
                 }
