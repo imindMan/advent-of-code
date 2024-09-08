@@ -9,17 +9,21 @@ pub fn main() !void {
     var in_stream = buf_reader.reader();
 
     var buf: [1024]u8 = undefined;
+    var counter: i32 = 0;
     while (try in_stream.readUntilDelimiterOrEof(&buf, '\n')) |line| {
-        try traceCounter(line);
+        const value = try traceCounter(line);
+        try std.io.getStdOut().writer().print("Value: {any}\n", .{value});
+        counter += value;
     }
+    try std.io.getStdOut().writer().print("{any}\n", .{counter});
 }
 
-fn traceCounter(line: []const u8) !void {
+fn traceCounter(line: []const u8) !i32 {
     var it = std.mem.split(u8, line, " ");
     var machines: []const u8 = undefined;
     var criterias: []const u8 = undefined;
 
-    var x:u8 = 0;
+    var x: u8 = 0;
     while (it.next()) |data| {
         if (x == 0) {
             machines = data;
@@ -29,50 +33,115 @@ fn traceCounter(line: []const u8) !void {
         x += 1;
     }
     const criterias_final = criteriasMaker(criterias);
-
-    std.debug.print("{s}\n", .{machines});
-    std.debug.print("{any}\n", .{criterias_final}); 
-    
-    var value: i32 = 0;
-    for (try criterias_final) |chars| {
-        const char_int: i32 = @as(i32, chars);
-        value = move(value, char_int, machines);
+    var counter: i32 = 0;
+    try possibleCase(try criterias_final, machines, 0, 0, &counter);
+    return counter;
+}
+fn array_contains(comptime T: type, haystack: []const T, needle: T) bool {
+    for (haystack) |element|
+        if (element == needle)
+            return true;
+    return false;
+}
+fn possibleCase(criterias: []u8, current_machine: []const u8, index_criteria: u8, index_machine: i8, counter: *i32) !void {
+    const index_parse: u8 = @bitCast(index_machine);
+    if (index_parse >= current_machine.len) {
+        return;
     }
+    var list_check = ArrayList(i8).init(std.heap.page_allocator);
+    defer list_check.deinit();
+    for (index_parse..current_machine.len -% 1) |track_index| {
+        const track_index_parse: i8 = @intCast(track_index);
+        const pos = move(track_index_parse, criterias[index_criteria], current_machine);
 
-    std.debug.print("{any}\n", .{value});
+        try std.io.getStdOut().writer().print("{s}, Criterias: {any}, Index: {any}, Pass: {any}, Pos: {any}, Value: {any}\n", .{current_machine, criterias, track_index_parse, index_criteria, pos, counter.*});
+        if (index_criteria == criterias.len -% 1 and pos != -1) {
+            if (array_contains(i8, list_check.items, pos) == false) {
+                var status = true;
+                if (pos + 1 < current_machine.len) {
+                    const pos_trace: u8 = @bitCast(pos + 1);
+                    if (array_contains(u8, current_machine[pos_trace..current_machine.len], '#') == true) {
+                        status = false;
+                    } else if (array_contains(u8, current_machine[index_parse..pos_trace], '#') == true 
+                        and array_contains(u8, current_machine[index_parse..pos_trace], '.') or array_contains(u8, current_machine[index_parse..pos_trace], '?') == false) {
+                        status = false;
+                    } 
+                }
+                if (status == true) {
+                    try list_check.append(pos);
+                    counter.* += 1;
+                }
+            }
+        } else if (pos != -1) {
+            if (array_contains(i8, list_check.items, pos) == false) {
+                try list_check.append(pos);
+                try possibleCase(criterias, current_machine, index_criteria +% 1, pos, counter);
+            }
+        }
+    }
+    return;
 }
 
-fn move(position: i32, chars: i32, line: []const u8) i32 {
-   if (position + chars - 1 >= line.len) {
+fn move(position: i8, chars: u8, line: []const u8) i8 {
+    var pos_check: u8 = @bitCast(position);
+    if (pos_check >= line.len) {
         return -1;
-   }
-   var pos_check: u8 = @as(usize, position - 1);
-   // check if there's any prev trailing characters
-   if (pos_check >= 0 and line[pos_check] == '#') {
-       while (position >= 0 and line[position] != '.') {
-          pos_check -= 1;
-       }
-       pos_check += 1;
-   } else {
-        pos_check = @as(usize, position);
-   }
-   for (pos_check..(pos_check + chars - 1)) |index| {
-       if (line[index] == '.') {
+    }
+    while (line[pos_check] == '.') {
+        if (pos_check == line.len - 1) {
             return -1;
-       }
-   }
-   // check if there's any behind trailing characters
-   if (pos_check + chars < line.len and line[pos_check + chars] == '#') {
-      return -1;
-   }
-   
-   return position + chars;
+        }
+        pos_check += 1;
+    }
+
+    var counter_check: u8 = 0;
+    if (pos_check +% chars - 1 >= line.len) {
+        return -1;
+    }
+
+    while (counter_check != chars) : (pos_check += 1) {
+        if (pos_check == line.len) {
+            break;
+        }
+        if (line[pos_check] == '.') {
+            counter_check = 0;
+        } else {
+            counter_check += 1;
+        }
+    }
+    if (counter_check == chars) {
+        if (pos_check < line.len) {
+            if (line[pos_check] == '#') {
+                if (pos_check + 1 >= line.len) {
+                    return @intCast(line.len);
+                } else {
+                    var counter_hash: u8 = 0;
+                    pos_check += 1;
+                    while (pos_check < line.len) : (pos_check += 1) {
+                        if (line[pos_check] == '#') {
+                            counter_hash += 1;
+                        } else if (line[pos_check] == '.' or line[pos_check] == '?') {
+                            break;
+                        }
+                    }
+                    if (counter_hash <= chars) {
+                        return @intCast(pos_check + 1);
+                    } else {
+                        return -1;
+                    }
+                }
+            }
+        }
+        return @intCast(pos_check + 1);
+    }
+
+    return -1;
 }
 
 fn criteriasMaker(criterias: []const u8) ![]u8 {
     var allocator = std.heap.page_allocator;
     var it = std.mem.split(u8, criterias, ",");
-    var len:u8 = 0;
+    var len: u8 = 0;
     while (it.next() != null) {
         len += 1;
     }
@@ -85,5 +154,5 @@ fn criteriasMaker(criterias: []const u8) ![]u8 {
         result[index] = maybe_num;
         index += 1;
     }
-    return result; 
+    return result;
 }
