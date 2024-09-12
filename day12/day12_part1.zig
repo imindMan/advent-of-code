@@ -12,7 +12,7 @@ pub fn main() !void {
     var counter: i32 = 0;
     while (try in_stream.readUntilDelimiterOrEof(&buf, '\n')) |line| {
         const value = try traceCounter(line);
-        try std.io.getStdOut().writer().print("Value: {any}\n", .{value});
+        try std.io.getStdOut().writer().print("Value: {any}, of {s} \n", .{value, line});
         counter += value;
     }
     try std.io.getStdOut().writer().print("{any}\n", .{counter});
@@ -43,28 +43,33 @@ fn array_contains(comptime T: type, haystack: []const T, needle: T) bool {
             return true;
     return false;
 }
-fn triggerChunks(machines: []const u8, chars: u8, start_pos: usize) ![] u8 {
+fn triggerChunks(machines: []const u8, chars: u8, start_pos: u8) !bool {
     var list_check = ArrayList(u8).init(std.heap.page_allocator);
 
+    defer list_check.deinit();
     var index: u8 = 0;
     var curr_chunk_len: u8 = 0;
-    while (index < machines.len) {
-        if (machines[index] == '#' and index != start_pos) { 
+    while (index < machines.len) : (index += 1) {
+        if (machines[index] == '#' or (index >= start_pos and index < start_pos + chars)) {
             curr_chunk_len += 1;
-            index += 1;
-        }
-        else if (machines[index] != '#' and index != start_pos) {
+        } else if (machines[index] != '#' and !(index >= start_pos or index < start_pos + chars)) {
             if (curr_chunk_len != 0) {
                 try list_check.append(curr_chunk_len);
             }
             curr_chunk_len = 0;
-            index += 1;
-        } else if (index == start_pos) {
-            try list_check.append(chars);
-            index += chars + 1;
         }
     }
-    return list_check.items;    
+    if (curr_chunk_len != 0) {
+        try list_check.append(curr_chunk_len);
+    }
+
+    if (list_check.items.len > 1) {
+        return false;
+    } else if (list_check.items[0] != chars) {
+        return false;
+    }
+
+    return true;
 }
 
 fn possibleCase(criterias: []u8, current_machine: []const u8, index_criteria: u8, index_machine: i8, counter: *i32) !void {
@@ -74,15 +79,18 @@ fn possibleCase(criterias: []u8, current_machine: []const u8, index_criteria: u8
     }
     var list_check = ArrayList(i8).init(std.heap.page_allocator);
     defer list_check.deinit();
-    for (index_parse..current_machine.len -% 1) |track_index| {
-        const track_index_parse: i8 = @intCast(track_index);
-        const pos = move(track_index_parse, criterias[index_criteria], current_machine);
 
-        try std.io.getStdOut().writer().print("{s}, Criterias: {any}, Index: {any}, Pass: {any}, Pos: {any}, Value: {any}\n", .{current_machine, criterias, track_index_parse, index_criteria, pos, counter.*});
+    for (index_parse..current_machine.len) |track_index| {
+        const track_index_parse: i8 = @intCast(track_index);
+        const pos = try move(track_index_parse, criterias[index_criteria], current_machine);
+
+// try std.io.getStdOut().writer().print("{s}, Criterias: {any}, Index: {any}, Pass: {any}, Pos: {any}, Value: {any}\n", .{ current_machine, criterias, track_index_parse, index_criteria, pos, counter.* });
         if (index_criteria == criterias.len -% 1 and pos != -1) {
+            const pos_parse: u8 = @bitCast(pos - 1);
             if (array_contains(i8, list_check.items, pos) == false) {
-                const chunks = try triggerChunks(current_machine[index_parse..current_machine.len], criterias[index_criteria], track_index -% index_parse);
-                if (chunks.len == 1) {
+                const chunks = try triggerChunks(current_machine[index_parse..current_machine.len], criterias[index_criteria], pos_parse - criterias[index_criteria] - index_parse);
+
+                if (chunks == true) {
                     try list_check.append(pos);
                     counter.* += 1;
                 }
@@ -97,7 +105,7 @@ fn possibleCase(criterias: []u8, current_machine: []const u8, index_criteria: u8
     return;
 }
 
-fn move(position: i8, chars: u8, line: []const u8) i8 {
+fn move(position: i8, chars: u8, line: []const u8) !i8 {
     var pos_check: u8 = @bitCast(position);
     if (pos_check >= line.len) {
         return -1;
@@ -110,6 +118,25 @@ fn move(position: i8, chars: u8, line: []const u8) i8 {
     }
 
     var counter_check: u8 = 0;
+    // move backward
+    if (line[pos_check] != '.' and pos_check > 0) {
+        if (line[pos_check -% 1] == '#') {
+            pos_check -%= 1;
+            while (pos_check != 255) {
+                if (line[pos_check] == '#') {
+                    pos_check -%= 1;
+                } else {
+                    break;
+                }
+            }
+            if (pos_check == 255) {
+                pos_check = 0;
+            } else {
+                pos_check +%= 1;
+            }
+        }
+    }
+
     if (pos_check +% chars - 1 >= line.len) {
         return -1;
     }
@@ -139,7 +166,7 @@ fn move(position: i8, chars: u8, line: []const u8) i8 {
                             break;
                         }
                     }
-                    if (counter_hash <= chars) {
+                    if (counter_hash <= chars and pos_check + 1 <= line.len + 1) {
                         return @intCast(pos_check + 1);
                     } else {
                         return -1;
@@ -147,9 +174,12 @@ fn move(position: i8, chars: u8, line: []const u8) i8 {
                 }
             }
         }
-        return @intCast(pos_check + 1);
+        if (pos_check + 1 > line.len + 1) {
+            return -1;
+        } else {
+            return @intCast(pos_check + 1);
+        }
     }
-
     return -1;
 }
 
