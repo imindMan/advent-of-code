@@ -71,7 +71,7 @@ fn possibleCase(criterias: []u8, current_machine: []const u8, index_criteria: u8
             const pos_parse: u8 = @bitCast(pos);
             if (array_contains(i8, list_check.items, pos) == false) {
                 const pos_parse_check: u8 = @bitCast(pos - 1);
-                pass_ = try checkValidate(current_machine[index_parse..pos_parse_check -% criterias[index_criteria]]);
+                pass_ = try checkValidate(current_machine[index_parse .. pos_parse_check -% criterias[index_criteria]]);
                 if (pass_ == true) {
                     if (pos_parse < current_machine.len) {
                         const chunks = try checkValidate(current_machine[pos_parse..current_machine.len]);
@@ -89,7 +89,7 @@ fn possibleCase(criterias: []u8, current_machine: []const u8, index_criteria: u8
             if (array_contains(i8, list_check.items, pos) == false) {
                 const pos_parse: u8 = @bitCast(pos - 1);
 
-                pass_ = try checkValidate(current_machine[index_parse..pos_parse -% criterias[index_criteria]]);
+                pass_ = try checkValidate(current_machine[index_parse .. pos_parse -% criterias[index_criteria]]);
                 if (pass_ == true) {
                     try list_check.append(pos);
                     try possibleCase(criterias, current_machine, index_criteria +% 1, pos, counter);
@@ -147,7 +147,7 @@ fn move(position: i8, chars: u8, line: []const u8) !i8 {
 
         if (line[pos_check] == '.' and pass_hash == false) {
             counter_check = 0;
-        } else if (line[pos_check] == '.' and pass_hash == true){
+        } else if (line[pos_check] == '.' and pass_hash == true) {
             return -1;
         } else {
             counter_check += 1;
