@@ -12,10 +12,9 @@ pub fn main() !void {
     var counter: i32 = 0;
     while (try in_stream.readUntilDelimiterOrEof(&buf, '\n')) |line| {
         const value = try traceCounter(line);
-        try std.io.getStdOut().writer().print("Value: {any}, of {s} \n", .{value, line});
         counter += value;
     }
-    try std.io.getStdOut().writer().print("{any}\n", .{counter});
+    std.debug.print("{any}\n", .{counter});
 }
 
 fn traceCounter(line: []const u8) !i32 {
@@ -43,30 +42,14 @@ fn array_contains(comptime T: type, haystack: []const T, needle: T) bool {
             return true;
     return false;
 }
-fn triggerChunks(machines: []const u8, chars: u8, start_pos: u8) !bool {
+fn checkValidate(machines: []const u8) !bool {
     var list_check = ArrayList(u8).init(std.heap.page_allocator);
-
     defer list_check.deinit();
     var index: u8 = 0;
-    var curr_chunk_len: u8 = 0;
     while (index < machines.len) : (index += 1) {
-        if (machines[index] == '#' or (index >= start_pos and index < start_pos + chars)) {
-            curr_chunk_len += 1;
-        } else if (machines[index] != '#' and !(index >= start_pos or index < start_pos + chars)) {
-            if (curr_chunk_len != 0) {
-                try list_check.append(curr_chunk_len);
-            }
-            curr_chunk_len = 0;
+        if (machines[index] == '#') {
+            return false;
         }
-    }
-    if (curr_chunk_len != 0) {
-        try list_check.append(curr_chunk_len);
-    }
-
-    if (list_check.items.len > 1) {
-        return false;
-    } else if (list_check.items[0] != chars) {
-        return false;
     }
 
     return true;
@@ -81,24 +64,36 @@ fn possibleCase(criterias: []u8, current_machine: []const u8, index_criteria: u8
     defer list_check.deinit();
 
     for (index_parse..current_machine.len) |track_index| {
+        var pass_: bool = true;
         const track_index_parse: i8 = @intCast(track_index);
         const pos = try move(track_index_parse, criterias[index_criteria], current_machine);
-
-// try std.io.getStdOut().writer().print("{s}, Criterias: {any}, Index: {any}, Pass: {any}, Pos: {any}, Value: {any}\n", .{ current_machine, criterias, track_index_parse, index_criteria, pos, counter.* });
         if (index_criteria == criterias.len -% 1 and pos != -1) {
-            const pos_parse: u8 = @bitCast(pos - 1);
+            const pos_parse: u8 = @bitCast(pos);
             if (array_contains(i8, list_check.items, pos) == false) {
-                const chunks = try triggerChunks(current_machine[index_parse..current_machine.len], criterias[index_criteria], pos_parse - criterias[index_criteria] - index_parse);
-
-                if (chunks == true) {
-                    try list_check.append(pos);
-                    counter.* += 1;
+                const pos_parse_check: u8 = @bitCast(pos - 1);
+                pass_ = try checkValidate(current_machine[index_parse..pos_parse_check -% criterias[index_criteria]]);
+                if (pass_ == true) {
+                    if (pos_parse < current_machine.len) {
+                        const chunks = try checkValidate(current_machine[pos_parse..current_machine.len]);
+                        if (chunks == true) {
+                            try list_check.append(pos);
+                            counter.* += 1;
+                        }
+                    } else {
+                        try list_check.append(pos);
+                        counter.* += 1;
+                    }
                 }
             }
         } else if (pos != -1) {
             if (array_contains(i8, list_check.items, pos) == false) {
-                try list_check.append(pos);
-                try possibleCase(criterias, current_machine, index_criteria +% 1, pos, counter);
+                const pos_parse: u8 = @bitCast(pos - 1);
+
+                pass_ = try checkValidate(current_machine[index_parse..pos_parse -% criterias[index_criteria]]);
+                if (pass_ == true) {
+                    try list_check.append(pos);
+                    try possibleCase(criterias, current_machine, index_criteria +% 1, pos, counter);
+                }
             }
         }
     }
@@ -141,12 +136,19 @@ fn move(position: i8, chars: u8, line: []const u8) !i8 {
         return -1;
     }
 
+    var pass_hash = false;
     while (counter_check != chars) : (pos_check += 1) {
         if (pos_check == line.len) {
             break;
         }
-        if (line[pos_check] == '.') {
+        if (line[pos_check] == '#') {
+            pass_hash = true;
+        }
+
+        if (line[pos_check] == '.' and pass_hash == false) {
             counter_check = 0;
+        } else if (line[pos_check] == '.' and pass_hash == true){
+            return -1;
         } else {
             counter_check += 1;
         }
@@ -154,8 +156,11 @@ fn move(position: i8, chars: u8, line: []const u8) !i8 {
     if (counter_check == chars) {
         if (pos_check < line.len) {
             if (line[pos_check] == '#') {
+                if (counter_check == 1) {
+                    return -1;
+                }
                 if (pos_check + 1 >= line.len) {
-                    return @intCast(line.len);
+                    return @intCast(line.len +% 1);
                 } else {
                     var counter_hash: u8 = 0;
                     pos_check += 1;
