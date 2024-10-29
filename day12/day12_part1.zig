@@ -67,9 +67,10 @@ fn possibleCase(criterias: []u8, current_machine: []const u8, index_criteria: u8
         var pass_: bool = true;
         const track_index_parse: i8 = @intCast(track_index);
         const pos = try move(track_index_parse, criterias[index_criteria], current_machine);
-        if (index_criteria == criterias.len -% 1 and pos != -1) {
-            const pos_parse: u8 = @bitCast(pos);
-            if (array_contains(i8, list_check.items, pos) == false) {
+
+        if (array_contains(i8, list_check.items, pos) == false) {
+            if (index_criteria == criterias.len -% 1 and pos != -1) {
+                const pos_parse: u8 = @bitCast(pos);
                 const pos_parse_check: u8 = @bitCast(pos - 1);
                 pass_ = try checkValidate(current_machine[index_parse .. pos_parse_check -% criterias[index_criteria]]);
                 if (pass_ == true) {
@@ -84,9 +85,7 @@ fn possibleCase(criterias: []u8, current_machine: []const u8, index_criteria: u8
                         counter.* += 1;
                     }
                 }
-            }
-        } else if (pos != -1) {
-            if (array_contains(i8, list_check.items, pos) == false) {
+            } else if (pos != -1) {
                 const pos_parse: u8 = @bitCast(pos - 1);
 
                 pass_ = try checkValidate(current_machine[index_parse .. pos_parse -% criterias[index_criteria]]);
