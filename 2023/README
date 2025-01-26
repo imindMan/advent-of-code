@@ -1,0 +1,21 @@
+So basically I solved Advent of Code 2023 in 25 programming languages. 
+
+Or another way to say it, one problem one language each.
+
+Note: the solutions are ugly. And I'm not guaranteed that it would work for you, but it worked on my local machine.
+
+I just spinned the wheel of 25 programming languages to pick a random one, and here's the list of the languages used for each day's submission.
+
+Day 1:  Java
+Day 2:  C
+Day 3:  JavaScript
+Day 4:  Go
+Day 5:  Python
+Day 6:  Lua
+Day 7:  Rust
+Day 8:  Ruby
+Day 9:  TypeScript
+Day 10: Crystal
+Day 11: PHP
+Day 12: Zig
+Day 13: OCaml
