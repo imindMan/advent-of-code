@@ -6,8 +6,11 @@ let rec group_one_map map_sep index =
    | 0 -> ("", index)
    | _ -> let (s, i) = group_one_map map_sep (index + 1) in (map_sep.(index) ^ "\n" ^ s, i)
 
-let rec maps map_sep =
-   
+let rec maps map_sep index =
+  if index >= (Array.length map_sep) then []
+  else 
+    let (s, i) = group_one_map map_sep index in
+    s :: (maps map_sep (i + 1))
   
 (*this is for reading the file*)
 let read_whole_chan chan =
@@ -30,5 +33,4 @@ let read_whole_file filename =
 let () =
   let str = read_whole_file "day13.txt" in
     let l = str |> String.split_on_char '\n' |> Array.of_list in
-      Array.iter (printf "%s\n") l;
-      printf "'%s' %d" (fst (group_one_map l 8)) (snd (group_one_map l 8))
+      List.iter (printf "'%s',\n") (List.map (fun x -> String.sub x 0 ((String.length x) - 1)) (maps l 0));
