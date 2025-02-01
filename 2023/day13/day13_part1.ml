@@ -11,7 +11,10 @@ let rec maps map_sep index =
   else 
     let (s, i) = group_one_map map_sep index in
     s :: (maps map_sep (i + 1))
- 
+
+let convert_map map = 
+  let new_map = Array.of_list (map |> String.split_on_char '\n' |> List.map (Bytes.of_string)) in new_map
+
 let transpose (matrix: bytes array) : bytes array =
   let rows = Array.length matrix in
   if rows = 0 then [||]
@@ -45,4 +48,4 @@ let () =
   let str = read_whole_file "day13.txt" in 
   let l = str |> String.split_on_char '\n' |> Array.of_list in
   let final_maps = List.map (fun x -> String.sub x 0 ((String.length x) - 1)) (maps l 0) in
-    
+  List.iter (fun x -> Array.iter (fun y -> printf "%s\n" (Bytes.to_string y)) (transpose (convert_map x)); print_endline "\n") final_maps
