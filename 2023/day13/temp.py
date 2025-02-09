@@ -38,13 +38,13 @@ def summary(grid):
             break
 
     assert vert == -1 or horiz == -1
+    print(f"r:{horiz} c:{vert}")
     return vert + 1 + 100 * (horiz + 1)
 
 
 ans = 0
 for grid in patterns:
     summ = summary(grid)
-    print(summ)
     ans += summ
 
 print(ans)
