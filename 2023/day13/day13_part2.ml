@@ -95,7 +95,6 @@ let symmetry (arr : string array) ignore =
   let v_org = List.filter (fun x -> x <> (snd ignore) && x <> -1) [snd head_trans_result; snd tail_trans_result] in
   let h = if List.length h_org = 0 then -1 else List.hd h_org in
   let v = if List.length v_org = 0 then -1 else List.hd v_org in
-  (* printf "pre: %d %d, exe: %d %d %d %d => %d %d\n" (fst ignore) (snd ignore) (snd head_result) (snd tail_result) (snd head_trans_result) (snd head_trans_result) h v; *)
   (h, v)
 
 let symmetry_2 (arr: string array) = 
