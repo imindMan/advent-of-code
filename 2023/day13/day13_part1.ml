@@ -101,5 +101,5 @@ let () =
   let str = read_whole_file "day13.txt" in 
   let l = str |> String.split_on_char '\n' |> Array.of_list in
   let final_maps = List.map (fun x -> String.sub x 0 ((String.length x) - 1)) (maps l 0) in
-  let res = List.fold_left (fun acc x -> printf "%d\n" (analyze x); acc + (analyze x)) 0 final_maps in
+  let res = List.fold_left (fun acc x -> acc + (analyze x)) 0 final_maps in
   printf "%d\n" res;
