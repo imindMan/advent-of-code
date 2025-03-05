@@ -1,0 +1,27 @@
+{
+  "name": "scala",
+  "argv": [
+    "/home/dev-vons/.cache/coursier/arc/https/github.com/scala/scala3/releases/download/3.6.3/scala3-3.6.3-x86_64-pc-linux.tar.gz/scala3-3.6.3-x86_64-pc-linux/libexec/scala-cli",
+    "--cli-default-scala-version",
+    "3.6.3",
+    "--repository",
+    "file:///home/dev-vons/.cache/coursier/arc/https/github.com/scala/scala3/releases/download/3.6.3/scala3-3.6.3-x86_64-pc-linux.tar.gz/scala3-3.6.3-x86_64-pc-linux/maven2",
+    "--prog-name",
+    "scala",
+    "--skip-cli-updates",
+    "bsp",
+    "--json-options",
+    "/home/dev-vons/advent-of-code/2023/day14/.scala-build/ide-options-v2.json",
+    "--json-launcher-options",
+    "/home/dev-vons/advent-of-code/2023/day14/.scala-build/ide-launcher-options.json",
+    "--envs-file",
+    "/home/dev-vons/advent-of-code/2023/day14/.scala-build/ide-envs.json",
+    "/home/dev-vons/advent-of-code/2023/day14/day14_part1.scala"
+  ],
+  "version": "1.5.4",
+  "bspVersion": "2.1.1",
+  "languages": [
+    "scala",
+    "java"
+  ]
+}
